@@ -22,13 +22,13 @@ public class TrailConfig {
 
     private List<Trail> generateDefaultList() {
         final ArrayList<Trail> trails = new ArrayList<>();
-        trails.add(new Trail("happytrails:hearts", "Hearts", 10, 30, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":hearts", "Hearts", 10, 30, ParticleEffect.builder()
         .type(ParticleTypes.HEART)
             .quantity(7)
             .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
             .build()));
         this.defaultTrail = "happytrails:hearts";
-        trails.add(new Trail("happytrails:villager_happy", "Happy Villager", 10, 30, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":villager_happy", "Happy Villager", 10, 30, ParticleEffect.builder()
             .type(ParticleTypes.HAPPY_VILLAGER)
             .quantity(13)
             .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)

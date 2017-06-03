@@ -32,7 +32,8 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
     @Override
     public Optional<TrailData> fill(DataHolder dataHolder, MergeFunction overlap) {
-        return dataHolder.get(TrailData.class).map(data -> this.setValue(data.getValue()));
+        final Optional<TrailData> trailData = dataHolder.get(TrailData.class);
+        return trailData.isPresent() ? trailData.map(data -> this.setValue(data.getValue())) : Optional.of(this);
     }
 
     @Override
@@ -40,7 +41,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
         if (!container.contains(TRAIL.getQuery())) {
             return Optional.empty();
         }
-        final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(Trail.HEART);
+        final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
         this.setValue(trail);
         return Optional.of(this);
     }
@@ -60,12 +61,6 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
         return 1;
     }
 
-    @Override
-    public DataContainer toContainer() {
-        return super.toContainer()
-            .set(TRAIL.getQuery(), this.getValue().getId());
-    }
-
     public Trail getTrail() {
         return this.getValue();
     }
@@ -80,7 +75,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
         implements ImmutableDataManipulator<Immutable, TrailData> {
 
         public Immutable(Trail value) {
-            super(value, Trail.HEART, TRAIL);
+            super(value, TrailRegistry.getInstance().getDefaultTrail(), TRAIL);
         }
 
         @Override
@@ -93,11 +88,6 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
             return 1;
         }
 
-        @Override
-        public DataContainer toContainer() {
-            return super.toContainer()
-                .set(TrailData.TRAIL.getQuery(), this.value.getId());
-        }
     }
 
     public static final class Builder extends AbstractDataBuilder<TrailData> implements DataManipulatorBuilder<TrailData, Immutable> {
@@ -108,19 +98,19 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
         @Override
         public TrailData create() {
-            return new TrailData(Trail.HEART);
+            return new TrailData(TrailRegistry.getInstance().getDefaultTrail());
         }
 
         @Override
         public Optional<TrailData> createFrom(DataHolder dataHolder) {
             final Optional<TrailData> trailData = dataHolder.get(TrailData.class);
-            return trailData.isPresent() ? trailData : Optional.of(new TrailData(Trail.HEART));
+            return trailData.isPresent() ? trailData : Optional.of(new TrailData(TrailRegistry.getInstance().getDefaultTrail()));
         }
 
         @Override
         protected Optional<TrailData> buildContent(DataView container) throws InvalidDataException {
             if (container.contains(TRAIL.getQuery())) {
-                final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().DEFAULT_TRAIL);
+                final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
                 return Optional.of(new TrailData(trail));
             }
             return Optional.empty();

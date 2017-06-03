@@ -59,11 +59,6 @@ public class Trail implements CatalogType, DataSerializable {
     public static final DataQuery PARTICLE_EFFECT = DataQuery.of("particle_effect");
 
     public static final Vector3d DEFAULT_VELOCITY = new Vector3d(0.5, 1, 0.4);
-    public static final Trail HEART = new Trail("happytrail:hearts", "Hearts", 10, 30, ParticleEffect.builder()
-        .type(ParticleTypes.HEART)
-        .quantity(7)
-        .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
-        .build());
 
     @Setting private String id;
     @Setting private String name;

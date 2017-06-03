@@ -4,7 +4,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Singleton;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOptions;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.RegistrationPhase;
 import org.spongepowered.api.registry.util.DelayedRegistration;
@@ -27,13 +29,21 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
         return INSTANCE;
     }
 
-    Trail DEFAULT_TRAIL = Trail.HEART;
+    private Trail defaultTrail = new Trail(HappyTrails.PLUGIN_ID + ":hearts", "Hearts", 10, 30, ParticleEffect.builder()
+        .type(ParticleTypes.HEART)
+        .quantity(7)
+        .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
+        .build());
+
+    public Trail getDefaultTrail() {
+        return this.defaultTrail;
+    }
 
     @Override
     public Optional<Trail> getById(String id) {
         String key = checkNotNull(id).toLowerCase(Locale.ENGLISH);
         if (!key.contains(":")) {
-            key = "happytrails:" + key;
+            key = HappyTrails.PLUGIN_ID + ":" + key;
         }
         return Optional.ofNullable(this.trails.get(key));
     }
@@ -71,10 +81,8 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
 
         Trail trail = this.trails.get(config.defaultTrail);
         if (trail == null) {
-            config.defaultTrail = Trail.HEART.getId();
-            trail = Trail.HEART;
+            config.defaultTrail = this.getDefaultTrail().getId();
         }
-        this.DEFAULT_TRAIL = trail;
 
     }
 }

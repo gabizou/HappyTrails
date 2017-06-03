@@ -16,6 +16,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
@@ -42,6 +43,8 @@ import javax.annotation.Nullable;
     }
 )
 public class HappyTrails {
+
+    public static final String PLUGIN_ID = "happytrails";
 
     private static HappyTrails INSTANCE;
 
@@ -113,6 +116,11 @@ public class HappyTrails {
         }
     }
 
+    @Listener
+    public void onGamePostInit(GamePostInitializationEvent event) {
+        Sponge.getCommandManager().register(this, TrailCommands.getCommand(), "trail", "happytrails", "trails");
+    }
+
     /**
      *
      * @param event
@@ -181,6 +189,37 @@ public class HappyTrails {
                 break;
             }
         }
+
+    }
+
+    public void setPlayer(Player player, Trail trail) {
+        boolean existed = false;
+        for (final Iterator<Map.Entry<PlayerWrapper, Trail>> iterator = this.playerTrails.entrySet().iterator(); iterator.hasNext(); ) {
+            final Map.Entry<PlayerWrapper, Trail> next = iterator.next();
+            if (next.getKey().playerId.equals(player.getUniqueId())) {
+                next.setValue(trail);
+                existed = true;
+                break;
+            }
+        }
+        if (!existed) {
+            this.playerTrails.put(new PlayerWrapper(player), trail);
+        }
+        final TrailData trailData = player.get(TrailData.class).orElseGet(() -> new TrailData(trail));
+        trailData.setTrail(trail);
+        player.offer(trailData);
+    }
+
+    public void removePlayer(Player player) {
+        final Iterator<Map.Entry<PlayerWrapper, Trail>> iterator = this.playerTrails.entrySet().iterator();
+        for (; iterator.hasNext(); ) {
+            final Map.Entry<PlayerWrapper, Trail> next = iterator.next();
+            if (next.getKey().playerId.equals(player.getUniqueId())) {
+                iterator.remove();
+                break;
+            }
+        }
+        player.remove(TrailData.class);
 
     }
 }
