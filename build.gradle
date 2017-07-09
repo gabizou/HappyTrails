@@ -19,7 +19,7 @@ plugins {
 group = pluginGroup
 version = pluginVersion
 ext.organization = 'Gabriel Harris-Rouquette'
-ext.url = 'gabizou.com'
+ext.url = 'https://gabizou.com/'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:5.2.0-SNAPSHOT'
@@ -28,7 +28,7 @@ dependencies {
 // License header formatting
 license {
     ext {
-        name = project.name
+        name = 'HappyTrails'
         organization = project.organization
         url = project.url
     }
