@@ -24,12 +24,14 @@
  */
 package com.gabizou.happytrails;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.util.Color;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +60,27 @@ public class TrailConfig {
             .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
             .option(ParticleOptions.OFFSET, Trail.DEFAULT_VELOCITY)
             .build()));
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":villager_storm", "Stormy Villager", 10, 30, ParticleEffect.builder()
+            .type(ParticleTypes.ANGRY_VILLAGER)
+            .quantity(5)
+            .option(ParticleOptions.VELOCITY, new Vector3d(0, 0.1, 0))
+            .option(ParticleOptions.OFFSET, new Vector3d(0, 3, 0))
+            .build()
+        ));
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":crit_strike", "Critical Strike", 5, 20, ParticleEffect.builder()
+            .type(ParticleTypes.CRITICAL_HIT)
+            .quantity(10)
+            .option(ParticleOptions.OFFSET, new Vector3d(10, 3, 10))
+            .option(ParticleOptions.COLOR, Color.DARK_CYAN)
+            .build()
+        ));
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":cloud", "Clouds", 2, 10, ParticleEffect.builder()
+            .type(ParticleTypes.CLOUD)
+            .quantity(2)
+            .option(ParticleOptions.OFFSET, new Vector3d(0, 3, 0))
+            .option(ParticleOptions.VELOCITY, new Vector3d(0.01, 0.01, 0.01))
+            .build()
+        ));
         return trails;
     }
 }

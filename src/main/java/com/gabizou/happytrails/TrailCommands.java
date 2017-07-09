@@ -27,19 +27,24 @@ package com.gabizou.happytrails;
 import static org.spongepowered.api.command.args.GenericArguments.choices;
 import static org.spongepowered.api.command.args.GenericArguments.firstParsing;
 
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.ChildCommandElementExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -75,7 +80,7 @@ public class TrailCommands {
             .arguments(choices(Text.of("trail"), () -> TrailRegistry.getInstance().getAll().stream().map(Trail::getId).collect(Collectors.toList()), Function.identity()))
             .executor(((src, args) -> {
                 if (!(src instanceof Player)) {
-                    return CommandResult.success();
+                    return CommandResult.empty();
                 }
                 final String trailId = args.<String>getOne("trail").get();
                 final Trail trail = TrailRegistry.getInstance().getById(trailId).orElseGet(() -> TrailRegistry.getInstance().getDefaultTrail());
@@ -104,15 +109,17 @@ public class TrailCommands {
             .description(Text.of("Adds a new trail"))
             .executor((src, args) -> {
                 if (!(src instanceof Player)) {
-                    return CommandResult.success();
+                    return CommandResult.empty();
                 }
                 final Inventory creator = Inventory.builder()
                     .of(InventoryArchetypes.CHEST)
-                    .property("title", new InventoryTitle(Text.of(TextColors.AQUA, "Create a Trail")))
+                    .property(InventoryTitle.PROPERTY_NAME, new InventoryTitle(Text.of(TextColors.AQUA, "Create a Trail")))
                     .listener(ClickInventoryEvent.Primary.class, (event) -> {
 
                     })
                     .build(HappyTrails.getInstance());
+                creator.offer(ItemStack.of(ItemTypes.FIREWORKS, 1));
+                creator.offer(ItemStack.builder().fromBlockState(BlockTypes.REDSTONE_BLOCK.getDefaultState()).build());
                 ((Player) src).openInventory(creator, Cause.of(NamedCause.source(HappyTrails.getInstance())));
                 return CommandResult.success();
             })
