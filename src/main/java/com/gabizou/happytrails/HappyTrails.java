@@ -64,7 +64,8 @@ import javax.annotation.Nullable;
     description = "A fancy plugin making trails for players to use",
     authors = {
         "gabizou"
-    }
+    },
+    url = "https://gabizou.com/"
 )
 public class HappyTrails {
 
