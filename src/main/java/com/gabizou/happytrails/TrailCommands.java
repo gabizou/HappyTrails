@@ -26,10 +26,19 @@ package com.gabizou.happytrails;
 
 import static org.spongepowered.api.command.args.GenericArguments.choices;
 import static org.spongepowered.api.command.args.GenericArguments.firstParsing;
+import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.ChildCommandElementExecutor;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -44,9 +53,14 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class TrailCommands {
     static final String INDENT = "    ";
@@ -77,13 +91,12 @@ public class TrailCommands {
         return CommandSpec.builder()
             .permission("happytrails.command.set")
             .description(Text.of("sets a trail to you as a player"))
-            .arguments(choices(Text.of("trail"), () -> TrailRegistry.getInstance().getAll().stream().map(Trail::getId).collect(Collectors.toList()), Function.identity()))
+            .arguments(new PermissionedCatalogTypeArgument(Text.of("trail"), "happytrails.trail.", Trail.class))
             .executor(((src, args) -> {
                 if (!(src instanceof Player)) {
                     return CommandResult.empty();
                 }
-                final String trailId = args.<String>getOne("trail").get();
-                final Trail trail = TrailRegistry.getInstance().getById(trailId).orElseGet(() -> TrailRegistry.getInstance().getDefaultTrail());
+                final Trail trail = args.<Trail>getOne("trail").get();
                 HappyTrails.getInstance().setPlayer((Player) src, trail);
                 return CommandResult.success();
             })).build();
@@ -129,6 +142,62 @@ public class TrailCommands {
 
     static Text title(String title) {
         return Text.of(TextColors.BLUE, title);
+    }
+
+    static class PermissionedCatalogTypeArgument extends CommandElement {
+        private final String permissionPrefix;
+        private final Class<? extends CatalogType> type;
+
+        public PermissionedCatalogTypeArgument(@Nonnull Text key, String permissionPrefix, Class<? extends CatalogType> type) {
+            super(key);
+            this.type = type;
+            this.permissionPrefix = permissionPrefix;
+        }
+
+        @Nullable
+        @Override
+        protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+            String arg = args.next().toLowerCase();
+
+            // Try
+            GameRegistry registry = Sponge.getRegistry();
+            Optional<? extends CatalogType> catalogType = registry.getType(this.type, arg);
+            if (!catalogType.isPresent() && !arg.contains(":")) {
+                catalogType = registry.getType(this.type, "minecraft:" + arg);
+                if (!catalogType.isPresent()) {
+                    catalogType = registry.getType(this.type, "happytrails:" + arg);
+                }
+            }
+
+            final String trimmedId = catalogType
+                .map(trail -> trail.getId().contains(":") ? trail.getId().split(":")[1] : trail.getId())
+                .orElse("");
+            if (catalogType.isPresent() && source.hasPermission(this.permissionPrefix + trimmedId)) {
+                return catalogType.get();
+            }
+
+            throw args.createError(Text.of(TextColors.RED, ""));
+        }
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+            try {
+                String arg = args.peek().toLowerCase();
+                return Sponge.getRegistry().getAllOf(this.type).stream()
+                    .filter(x ->
+                        x.getId().startsWith(arg)
+                        || x.getId().startsWith("happytrails:" + arg)
+                    )
+                    .filter(x -> {
+                        final String trimmedId = x.getId().contains(":") ? x.getId().split(":")[1] : x.getId();
+                        return src.hasPermission(this.permissionPrefix + trimmedId);
+                    })
+                    .map(CatalogType::getId)
+                    .collect(Collectors.toList());
+            } catch (Exception e) {
+                return Sponge.getRegistry().getAllOf(this.type).stream().map(CatalogType::getId).collect(Collectors.toList());
+            }
+        }
     }
 
 }

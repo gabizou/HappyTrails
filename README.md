@@ -1,5 +1,5 @@
 # HappyTrails
-- 
+
 Welcome to **HappyTrails**, a trails plugin for Sponge!
 
 Authors: gabizou
@@ -196,3 +196,11 @@ trails=[
 - Creation of trails through commands with an in game menu system
 - Per trail permissions
 - Maybe allowing multiple trails to be set at once
+
+#### Version History
+
+
+Version | Features / Changes | Date
+--------|--------------------|-------
+0.1.0 | <ul><li>Configurable Trails</li><li>Trails have period duration and player range</li></ul> | July 9th, 2017
+0.1.1 | <ul><li>Per-trail permissions. The permission for the trail is based on the `id` of the trail *after* the plugin id. So, if the id is `happytrails:villager_storm`, the permission will be `happytrails.trail.villager_storm` | July 9th, 2017
