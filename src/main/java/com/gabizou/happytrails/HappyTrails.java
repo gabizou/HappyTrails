@@ -35,6 +35,7 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.DataManager;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -92,10 +93,11 @@ public class HappyTrails {
             Logger logger,
             GameRegistry registry,
             PluginContainer container,
-            @DefaultConfig(sharedRoot = false) Path defaultConfig) {
+            @DefaultConfig(sharedRoot = false) Path defaultConfig,
+            DataManager dataManager) {
         this.logger = logger;
         this.registry = registry;
-        this.manager = Sponge.getDataManager(); // In API 6, this can be injected
+        this.manager = dataManager;
         this.container = container;
         this.defaultConfig = defaultConfig;
         this.config = new TrailConfig();
@@ -111,7 +113,13 @@ public class HappyTrails {
     public void onGameStart(GamePreInitializationEvent event) {
         this.registry.registerModule(Trail.class, TrailRegistry.getInstance());
         this.manager.registerBuilder(Trail.class, new Trail.Builder());
-        this.manager.register(TrailData.class, TrailData.Immutable.class, new TrailData.Builder());
+        DataRegistration.builder()
+                .dataClass(TrailData.class)
+                .immutableClass(TrailData.Immutable.class)
+                .builder(new TrailData.Builder())
+                .manipulatorId("trail")
+                .dataName("Trail Data")
+                .buildAndRegister(this.container);
     }
 
     @Listener

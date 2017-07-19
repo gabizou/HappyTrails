@@ -25,6 +25,7 @@
 package com.gabizou.happytrails;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -138,7 +139,7 @@ public class Trail implements CatalogType, DataSerializable {
 
     @Override
     public String toString() {
-        return com.google.common.base.Objects.toStringHelper(this)
+        return MoreObjects.toStringHelper(this)
             .add("effect", this.effect)
             .add("period", this.period)
             .add("radius", this.radius)
