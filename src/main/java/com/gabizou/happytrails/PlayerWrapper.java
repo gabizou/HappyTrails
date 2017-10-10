@@ -31,26 +31,27 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
-public class PlayerWrapper {
+class PlayerWrapper {
 
-    WeakReference<Player> playerReference;
+    private WeakReference<Player> playerReference;
     UUID playerId;
     int cooldown;
 
-    public PlayerWrapper(Player player) {
-        this.playerReference = new WeakReference<Player>(player);
+    PlayerWrapper(Player player) {
+        this.playerReference = new WeakReference<>(player);
         this.playerId = player.getUniqueId();
     }
 
-    public Player getPlayer() {
-        if (this.playerReference.get() != null) {
-            return this.playerReference.get();
+    Player getPlayer() {
+        Player temp = this.playerReference.get();
+        if (temp != null) {
+            return temp;
         }
         final Optional<Player> player = Sponge.getServer().getPlayer(this.playerId);
         if (!player.isPresent()) {
             throw new IllegalStateException("Outdated player wrapper reference!");
         }
-        this.playerReference = new WeakReference<Player>(player.get());
+        this.playerReference = new WeakReference<>(player.get());
         return player.get();
     }
 

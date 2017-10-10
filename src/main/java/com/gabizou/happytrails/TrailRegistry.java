@@ -49,7 +49,7 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
 
     private TrailRegistry() { }
 
-    public static TrailRegistry getInstance() {
+    static TrailRegistry getInstance() {
         return INSTANCE;
     }
 
@@ -59,7 +59,7 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
         .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
         .build());
 
-    public Trail getDefaultTrail() {
+    Trail getDefaultTrail() {
         return this.defaultTrail;
     }
 

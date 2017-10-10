@@ -24,26 +24,15 @@
  */
 package com.gabizou.happytrails;
 
-import static org.spongepowered.api.command.args.GenericArguments.choices;
-import static org.spongepowered.api.command.args.GenericArguments.firstParsing;
-import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
-
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.ChildCommandElementExecutor;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.args.*;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -53,18 +42,17 @@ import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-public class TrailCommands {
-    static final String INDENT = "    ";
-    static final String LONG_INDENT = INDENT + INDENT;
+import static org.spongepowered.api.command.args.GenericArguments.firstParsing;
+
+class TrailCommands {
+    private static final String INDENT = "    ";
+    private static final String LONG_INDENT = INDENT + INDENT;
 
     static final Text INDENT_TEXT = Text.of(INDENT);
     static final Text NEWLINE_TEXT = Text.NEW_LINE;
@@ -72,7 +60,7 @@ public class TrailCommands {
     static final Text LIST_ITEM_TEXT = Text.of(TextColors.DARK_AQUA, "- ");
     static final Text UNKNOWN = Text.of("UNKNOWN");
 
-    public static CommandSpec getCommand() {
+    static CommandSpec getCommand() {
         final ChildCommandElementExecutor flagChildren = new ChildCommandElementExecutor(null);
         final ChildCommandElementExecutor nonFlagChildren = new ChildCommandElementExecutor(flagChildren);
         nonFlagChildren.register(getSetTrailCommand(), "set", "setTrail", "settrail");
@@ -133,14 +121,14 @@ public class TrailCommands {
                     .build(HappyTrails.getInstance());
                 creator.offer(ItemStack.of(ItemTypes.FIREWORKS, 1));
                 creator.offer(ItemStack.builder().fromBlockState(BlockTypes.REDSTONE_BLOCK.getDefaultState()).build());
-                ((Player) src).openInventory(creator, Cause.of(NamedCause.source(HappyTrails.getInstance())));
+                ((Player) src).openInventory(creator);
                 return CommandResult.success();
             })
             .build();
 
     }
 
-    static Text title(String title) {
+    private static Text title(String title) {
         return Text.of(TextColors.BLUE, title);
     }
 
@@ -148,7 +136,7 @@ public class TrailCommands {
         private final String permissionPrefix;
         private final Class<? extends CatalogType> type;
 
-        public PermissionedCatalogTypeArgument(@Nonnull Text key, String permissionPrefix, Class<? extends CatalogType> type) {
+        PermissionedCatalogTypeArgument(@Nonnull Text key, String permissionPrefix, Class<? extends CatalogType> type) {
             super(key);
             this.type = type;
             this.permissionPrefix = permissionPrefix;

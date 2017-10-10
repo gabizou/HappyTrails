@@ -35,12 +35,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.Queries;
+import org.spongepowered.api.data.*;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataTranslators;
@@ -56,7 +51,7 @@ import java.util.Optional;
 @ConfigSerializable
 public class Trail implements CatalogType, DataSerializable {
 
-    public static final TypeToken<Trail> TRAIL_TYPE_TOKEN;
+    private static final TypeToken<Trail> TRAIL_TYPE_TOKEN;
     static {
         TRAIL_TYPE_TOKEN = new TypeToken<Trail>() {};
         TypeSerializers.getDefaultSerializers().registerType(TRAIL_TYPE_TOKEN, new TypeSerializer<Trail>() {
@@ -77,19 +72,19 @@ public class Trail implements CatalogType, DataSerializable {
         );
     }
 
-    public static final DataQuery ID_QUERY = DataQuery.of("id");
-    public static final DataQuery NAME_QUERY = DataQuery.of("name");
-    public static final DataQuery PERIOD = DataQuery.of("period");
-    public static final DataQuery RADIUS = DataQuery.of("radius");
-    public static final DataQuery PARTICLE_EFFECT = DataQuery.of("particle_effect");
+    static final DataQuery ID_QUERY = DataQuery.of("id");
+    static final DataQuery NAME_QUERY = DataQuery.of("name");
+    static final DataQuery PERIOD = DataQuery.of("period");
+    static final DataQuery RADIUS = DataQuery.of("radius");
+    static final DataQuery PARTICLE_EFFECT = DataQuery.of("particle_effect");
 
-    public static final Vector3d DEFAULT_VELOCITY = new Vector3d(0.5, 1, 0.4);
+    static final Vector3d DEFAULT_VELOCITY = new Vector3d(0.5, 1, 0.4);
 
     @Setting private String id;
     @Setting private String name;
-    @Setting public int period = 5;
-    @Setting public int radius = 10;
-    @Setting public ParticleEffect effect = ParticleEffect.builder()
+    @Setting int period = 5;
+    @Setting private int radius = 10;
+    @Setting private ParticleEffect effect = ParticleEffect.builder()
         .type(ParticleTypes.HEART)
         .quantity(10)
         .option(ParticleOptions.VELOCITY, DEFAULT_VELOCITY)
@@ -104,7 +99,7 @@ public class Trail implements CatalogType, DataSerializable {
         this.effect = effect;
     }
 
-    public void playEffect(Player player) {
+    void playEffect(Player player) {
         player.getWorld().spawnParticles(this.effect, player.getLocation().getPosition(), this.radius);
     }
 
@@ -166,7 +161,7 @@ public class Trail implements CatalogType, DataSerializable {
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer() // In API 6, this is DataContainer.createNew()
+        return DataContainer.createNew()
             .set(Queries.CONTENT_VERSION, this.getContentVersion())
             .set(ID_QUERY, this.id)
             .set(NAME_QUERY, this.name)
@@ -177,7 +172,7 @@ public class Trail implements CatalogType, DataSerializable {
 
     public static final class Builder extends AbstractDataBuilder<Trail> implements DataBuilder<Trail> {
 
-        public Builder() {
+        Builder() {
             super(Trail.class, 1);
         }
 

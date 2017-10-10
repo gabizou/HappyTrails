@@ -37,13 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @ConfigSerializable
-public class TrailConfig {
+class TrailConfig {
 
-    public static final TypeToken<TrailConfig> TYPE_TOKEN = new TypeToken<TrailConfig>() {};
+    static final TypeToken<TrailConfig> TYPE_TOKEN = new TypeToken<TrailConfig>() {};
 
-    @Setting public List<Trail> trails = generateDefaultList();
+    @Setting List<Trail> trails = generateDefaultList();
 
-    @Setting public String defaultTrail;
+    @Setting String defaultTrail = "happytrails:hearts";
 
 
     private List<Trail> generateDefaultList() {

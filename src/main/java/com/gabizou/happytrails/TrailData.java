@@ -45,12 +45,12 @@ import java.util.Optional;
 
 public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, TrailData.Immutable> implements DataManipulator<TrailData, TrailData.Immutable> {
 
-    public static final TypeToken<Trail> TRAIL_TOKEN = new TypeToken<Trail>() {};
-    public static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
+    private static final TypeToken<Trail> TRAIL_TOKEN = new TypeToken<Trail>() {};
+    private static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
 
-    public static final Key<Value<Trail>> TRAIL = KeyFactory.makeSingleKey(TRAIL_TOKEN, TRAIL_VALUE_TOKEN, DataQuery.of("trail"), "happytrail:trail", "Trail");
+    static final Key<Value<Trail>> TRAIL = KeyFactory.makeSingleKey(TRAIL_TOKEN, TRAIL_VALUE_TOKEN, DataQuery.of("trail"), "happytrail:trail", "Trail");
 
-    public TrailData(Trail value) {
+    TrailData(Trail value) {
         super(value, TRAIL);
     }
 
@@ -85,20 +85,19 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
         return 1;
     }
 
-    public Trail getTrail() {
+    Trail getTrail() {
         return this.getValue();
     }
 
-    public TrailData setTrail(Trail trail) {
+    void setTrail(Trail trail) {
         this.setValue(trail);
-        return this;
     }
 
     public static final class Immutable
         extends AbstractImmutableSingleCatalogData<Trail, Immutable, TrailData>
         implements ImmutableDataManipulator<Immutable, TrailData> {
 
-        public Immutable(Trail value) {
+        Immutable(Trail value) {
             super(value, TrailRegistry.getInstance().getDefaultTrail(), TRAIL);
         }
 
@@ -116,7 +115,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
     public static final class Builder extends AbstractDataBuilder<TrailData> implements DataManipulatorBuilder<TrailData, Immutable> {
 
-        public Builder() {
+        Builder() {
             super(TrailData.class, 1);
         }
 

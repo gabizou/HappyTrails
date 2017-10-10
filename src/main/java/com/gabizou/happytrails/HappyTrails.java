@@ -29,7 +29,6 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
@@ -40,24 +39,20 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
+import org.spongepowered.api.event.game.GameReloadEvent;
+import org.spongepowered.api.event.game.state.*;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 @Plugin(
     id = "happytrails",
@@ -70,7 +65,7 @@ import javax.annotation.Nullable;
 )
 public class HappyTrails {
 
-    public static final String PLUGIN_ID = "happytrails";
+    static final String PLUGIN_ID = "happytrails";
 
     private static HappyTrails INSTANCE;
 
@@ -83,10 +78,10 @@ public class HappyTrails {
 
     private HoconConfigurationLoader loader;
 
-    Map<PlayerWrapper, Trail> playerTrails = new HashMap<>();
+    private Map<PlayerWrapper, Trail> playerTrails = new HashMap<>();
 
     @Nullable private Task particleTask;
-    TrailConfig config;
+    private TrailConfig config;
 
     @Inject
     private HappyTrails(
@@ -105,7 +100,7 @@ public class HappyTrails {
     }
 
 
-    public static HappyTrails getInstance() {
+    static HappyTrails getInstance() {
         return INSTANCE;
     }
 
@@ -133,9 +128,31 @@ public class HappyTrails {
                 TrailRegistry.getInstance().registerFromConfig(newConfig);
                 final ConfigurationNode configurationNode = this.loader.createEmptyNode().setValue(TrailConfig.TYPE_TOKEN, newConfig);
                 this.loader.save(configurationNode);
-            } catch (IOException e) {
+            } catch (IOException | ObjectMappingException e) {
                 e.printStackTrace();
-            } catch (ObjectMappingException e) {
+            }
+        }
+        try {
+            final CommentedConfigurationNode config = this.loader.load();
+            final TrailConfig trailConfig = config.getValue(TrailConfig.TYPE_TOKEN);
+            this.config = trailConfig == null ? new TrailConfig() : trailConfig;
+        } catch (IOException | ObjectMappingException e) {
+            e.printStackTrace();
+        } finally {
+            TrailRegistry.getInstance().registerFromConfig(this.config);
+        }
+    }
+
+    @Listener
+    public void onReload(GameReloadEvent event) {
+        if (!Files.exists(this.defaultConfig)) {
+            try {
+                Files.createFile(this.defaultConfig);
+                final TrailConfig newConfig = new TrailConfig();
+                TrailRegistry.getInstance().registerFromConfig(newConfig);
+                final ConfigurationNode configurationNode = this.loader.createEmptyNode().setValue(TrailConfig.TYPE_TOKEN, newConfig);
+                this.loader.save(configurationNode);
+            } catch (IOException | ObjectMappingException e) {
                 e.printStackTrace();
             }
         }
@@ -155,10 +172,6 @@ public class HappyTrails {
         Sponge.getCommandManager().register(this, TrailCommands.getCommand(), "trail", "happytrails", "trails");
     }
 
-    /**
-     *
-     * @param event
-     */
     @Listener(order = Order.POST)
     public void onServerStart(GameStartedServerEvent event) {
         // Hey! The server has started!
@@ -226,7 +239,7 @@ public class HappyTrails {
 
     }
 
-    public void setPlayer(Player player, Trail trail) {
+    void setPlayer(Player player, Trail trail) {
         boolean existed = false;
         for (final Map.Entry<PlayerWrapper, Trail> next : this.playerTrails.entrySet()) {
             if (next.getKey().playerId.equals(player.getUniqueId())) {
@@ -243,7 +256,7 @@ public class HappyTrails {
         player.offer(trailData);
     }
 
-    public void removePlayer(Player player) {
+    void removePlayer(Player player) {
         final Iterator<Map.Entry<PlayerWrapper, Trail>> iterator = this.playerTrails.entrySet().iterator();
         for (; iterator.hasNext(); ) {
             final Map.Entry<PlayerWrapper, Trail> next = iterator.next();
