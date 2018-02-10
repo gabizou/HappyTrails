@@ -43,38 +43,38 @@ class TrailConfig {
 
     @Setting List<Trail> trails = generateDefaultList();
 
-    @Setting String defaultTrail = "happytrails:hearts";
+    @Setting String defaultTrail = Constants.DEFAULT_TRAIL_ID;
 
 
     private List<Trail> generateDefaultList() {
         final ArrayList<Trail> trails = new ArrayList<>();
-        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":hearts", "Hearts", 10, 30, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + Constants.HEARTS_ID, Constants.HEARTS_NAME, 10, 30, ParticleEffect.builder()
         .type(ParticleTypes.HEART)
             .quantity(7)
             .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
             .build()));
-        this.defaultTrail = "happytrails:hearts";
-        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":villager_happy", "Happy Villager", 10, 30, ParticleEffect.builder()
+        this.defaultTrail = Constants.DEFAULT_TRAIL_ID;
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + Constants.VILLAGER_HAPPY_ID, Constants.HAPPY_VILLAGER_NAME, 10, 30, ParticleEffect.builder()
             .type(ParticleTypes.HAPPY_VILLAGER)
             .quantity(13)
             .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
             .option(ParticleOptions.OFFSET, Trail.DEFAULT_VELOCITY)
             .build()));
-        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":villager_storm", "Stormy Villager", 10, 30, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + Constants.VILLAGER_STORM_ID, Constants.STORMY_VILLAGER_NAME, 10, 30, ParticleEffect.builder()
             .type(ParticleTypes.ANGRY_VILLAGER)
             .quantity(5)
             .option(ParticleOptions.VELOCITY, new Vector3d(0, 0.1, 0))
             .option(ParticleOptions.OFFSET, new Vector3d(0, 3, 0))
             .build()
         ));
-        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":crit_strike", "Critical Strike", 5, 20, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + Constants.CRIT_STRIKE_ID, Constants.CRITICAL_STRIKE_NAME, 5, 20, ParticleEffect.builder()
             .type(ParticleTypes.CRITICAL_HIT)
             .quantity(10)
             .option(ParticleOptions.OFFSET, new Vector3d(10, 3, 10))
             .option(ParticleOptions.COLOR, Color.DARK_CYAN)
             .build()
         ));
-        trails.add(new Trail(HappyTrails.PLUGIN_ID + ":cloud", "Clouds", 2, 10, ParticleEffect.builder()
+        trails.add(new Trail(HappyTrails.PLUGIN_ID + Constants.CLOUD_ID, Constants.CLOUDS_NAME, 2, 10, ParticleEffect.builder()
             .type(ParticleTypes.CLOUD)
             .quantity(2)
             .option(ParticleOptions.OFFSET, new Vector3d(0, 3, 0))

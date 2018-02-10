@@ -24,6 +24,7 @@
  */
 package com.gabizou.happytrails;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -34,11 +35,17 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.data.DataManager;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.KeyFactory;
+import org.spongepowered.api.data.persistence.DataBuilder;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.game.GameRegistryEvent;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.event.game.state.*;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
@@ -66,6 +73,9 @@ import java.util.Map;
 public class HappyTrails {
 
     static final String PLUGIN_ID = "happytrails";
+    private static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
+    public static final Key<Value<Trail>>
+        TRAIL = Key.builder().type(TRAIL_VALUE_TOKEN).query(DataQuery.of("trail")).id("happytrail:trail").name("Trail").build();
 
     private static HappyTrails INSTANCE;
 
@@ -107,14 +117,24 @@ public class HappyTrails {
     @Listener
     public void onGameStart(GamePreInitializationEvent event) {
         this.registry.registerModule(Trail.class, TrailRegistry.getInstance());
+
+    }
+
+    @Listener
+    public void registerModule(GameRegistryEvent.Register<DataRegistration> event) {
         this.manager.registerBuilder(Trail.class, new Trail.Builder());
         DataRegistration.builder()
-                .dataClass(TrailData.class)
-                .immutableClass(TrailData.Immutable.class)
-                .builder(new TrailData.Builder())
-                .manipulatorId("trail")
-                .dataName("Trail Data")
-                .buildAndRegister(this.container);
+            .dataClass(TrailData.class)
+            .immutableClass(TrailData.Immutable.class)
+            .builder(new TrailData.Builder())
+            .manipulatorId("trail")
+            .dataName("Trail Data")
+            .buildAndRegister(this.container);
+    }
+
+    @Listener
+    public void registerKeys(GameRegistryEvent.Register<Key> event) {
+        event.register(HappyTrails.TRAIL);
     }
 
     @Listener

@@ -27,10 +27,7 @@ package com.gabizou.happytrails;
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -45,13 +42,8 @@ import java.util.Optional;
 
 public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, TrailData.Immutable> implements DataManipulator<TrailData, TrailData.Immutable> {
 
-    private static final TypeToken<Trail> TRAIL_TOKEN = new TypeToken<Trail>() {};
-    private static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
-
-    static final Key<Value<Trail>> TRAIL = KeyFactory.makeSingleKey(TRAIL_TOKEN, TRAIL_VALUE_TOKEN, DataQuery.of("trail"), "happytrail:trail", "Trail");
-
     TrailData(Trail value) {
-        super(value, TRAIL);
+        super(value, HappyTrails.TRAIL);
     }
 
     @Override
@@ -62,10 +54,10 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
     @Override
     public Optional<TrailData> from(DataContainer container) {
-        if (!container.contains(TRAIL.getQuery())) {
+        if (!container.contains(HappyTrails.TRAIL.getQuery())) {
             return Optional.empty();
         }
-        final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
+        final Trail trail = container.getCatalogType(HappyTrails.TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
         this.setValue(trail);
         return Optional.of(this);
     }
@@ -98,7 +90,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
         implements ImmutableDataManipulator<Immutable, TrailData> {
 
         Immutable(Trail value) {
-            super(value, TrailRegistry.getInstance().getDefaultTrail(), TRAIL);
+            super(value, TrailRegistry.getInstance().getDefaultTrail(), HappyTrails.TRAIL);
         }
 
         @Override
@@ -132,8 +124,8 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
         @Override
         protected Optional<TrailData> buildContent(DataView container) throws InvalidDataException {
-            if (container.contains(TRAIL.getQuery())) {
-                final Trail trail = container.getCatalogType(TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
+            if (container.contains(HappyTrails.TRAIL.getQuery())) {
+                final Trail trail = container.getCatalogType(HappyTrails.TRAIL.getQuery(), Trail.class).orElse(TrailRegistry.getInstance().getDefaultTrail());
                 return Optional.of(new TrailData(trail));
             }
             return Optional.empty();

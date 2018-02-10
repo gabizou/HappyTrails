@@ -22,7 +22,7 @@ ext.organization = 'Gabriel Harris-Rouquette'
 ext.url = 'https://gabizou.com/'
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:7.1.0-SNAPSHOT'
 }
 
 // License header formatting
