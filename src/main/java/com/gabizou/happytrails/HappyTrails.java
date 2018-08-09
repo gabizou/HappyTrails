@@ -38,8 +38,6 @@ import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
-import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -62,8 +60,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Plugin(
-    id = "happytrails",
-    name = "HappyTrails",
+    id = Constants.MOD_ID,
+    name = Constants.MOD_NAME,
     description = "A fancy plugin making trails for players to use",
     authors = {
         "gabizou"
@@ -72,12 +70,11 @@ import java.util.Map;
 )
 public class HappyTrails {
 
-    static final String PLUGIN_ID = "happytrails";
     private static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
-    public static final Key<Value<Trail>>
-        TRAIL = Key.builder().type(TRAIL_VALUE_TOKEN).query(DataQuery.of("trail")).id("happytrail:trail").name("Trail").build();
+    static final Key<Value<Trail>>
+        TRAIL = Key.builder().type(TRAIL_VALUE_TOKEN).query(Constants.KEY_QUERY).id(Constants.MOD_ID + ":" + Constants.KEY_ID).name("Trail").build();
 
-    private static HappyTrails INSTANCE;
+    @Nullable private static HappyTrails /* this is really hacky*/ INSTANCE;
 
     Logger logger;
     private GameRegistry registry;
@@ -105,12 +102,16 @@ public class HappyTrails {
         this.manager = dataManager;
         this.container = container;
         this.defaultConfig = defaultConfig;
+        this.loader = HoconConfigurationLoader.builder().setPath(this.defaultConfig).build();
         this.config = new TrailConfig();
         INSTANCE = this;
     }
 
 
     static HappyTrails getInstance() {
+        if (INSTANCE == null) {
+            throw new IllegalStateException("HappyTrails has not loaded yet!");
+        }
         return INSTANCE;
     }
 
@@ -121,7 +122,7 @@ public class HappyTrails {
     }
 
     @Listener
-    public void registerModule(GameRegistryEvent.Register<DataRegistration> event) {
+    public void registerModule(GameRegistryEvent.Register<DataRegistration<?, ?>> event) {
         this.manager.registerBuilder(Trail.class, new Trail.Builder());
         DataRegistration.builder()
             .dataClass(TrailData.class)
@@ -133,25 +134,36 @@ public class HappyTrails {
     }
 
     @Listener
-    public void registerKeys(GameRegistryEvent.Register<Key> event) {
+    public void registerKeys(GameRegistryEvent.Register<Key<?>> event) {
         event.register(HappyTrails.TRAIL);
     }
 
     @Listener
     public void onGameInit(GameInitializationEvent event) {
         //Load up config files for trail registrations
-        this.loader = HoconConfigurationLoader.builder().setPath(this.defaultConfig).build();
         if (!Files.exists(this.defaultConfig)) {
             try {
-                Files.createFile(this.defaultConfig);
-                final TrailConfig newConfig = new TrailConfig();
-                TrailRegistry.getInstance().registerFromConfig(newConfig);
-                final ConfigurationNode configurationNode = this.loader.createEmptyNode().setValue(TrailConfig.TYPE_TOKEN, newConfig);
-                this.loader.save(configurationNode);
+                populateTrailsFromConfig();
             } catch (IOException | ObjectMappingException e) {
                 e.printStackTrace();
             }
         }
+        loadConfig();
+    }
+
+    @Listener
+    public void onReload(GameReloadEvent event) {
+        if (!Files.exists(this.defaultConfig)) {
+            try {
+                populateTrailsFromConfig();
+            } catch (IOException | ObjectMappingException e) {
+                e.printStackTrace();
+            }
+        }
+        loadConfig();
+    }
+
+    private void loadConfig() {
         try {
             final CommentedConfigurationNode config = this.loader.load();
             final TrailConfig trailConfig = config.getValue(TrailConfig.TYPE_TOKEN);
@@ -163,28 +175,12 @@ public class HappyTrails {
         }
     }
 
-    @Listener
-    public void onReload(GameReloadEvent event) {
-        if (!Files.exists(this.defaultConfig)) {
-            try {
-                Files.createFile(this.defaultConfig);
-                final TrailConfig newConfig = new TrailConfig();
-                TrailRegistry.getInstance().registerFromConfig(newConfig);
-                final ConfigurationNode configurationNode = this.loader.createEmptyNode().setValue(TrailConfig.TYPE_TOKEN, newConfig);
-                this.loader.save(configurationNode);
-            } catch (IOException | ObjectMappingException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            final CommentedConfigurationNode config = this.loader.load();
-            final TrailConfig trailConfig = config.getValue(TrailConfig.TYPE_TOKEN);
-            this.config = trailConfig == null ? new TrailConfig() : trailConfig;
-        } catch (IOException | ObjectMappingException e) {
-            e.printStackTrace();
-        } finally {
-            TrailRegistry.getInstance().registerFromConfig(this.config);
-        }
+    private void populateTrailsFromConfig() throws IOException, ObjectMappingException {
+        Files.createFile(this.defaultConfig);
+        final TrailConfig newConfig = new TrailConfig();
+        TrailRegistry.getInstance().registerFromConfig(newConfig);
+        final ConfigurationNode configurationNode = this.loader.createEmptyNode().setValue(TrailConfig.TYPE_TOKEN, newConfig);
+        this.loader.save(configurationNode);
     }
 
     @Listener
@@ -194,10 +190,6 @@ public class HappyTrails {
 
     @Listener(order = Order.POST)
     public void onServerStart(GameStartedServerEvent event) {
-        // Hey! The server has started!
-        this.logger.info("Hello world!");
-        // Try loading some configuration settings for a welcome message to players
-        // when they join!
         this.particleTask = Task.builder()
             .intervalTicks(1)
             .name("Particle Spawner")

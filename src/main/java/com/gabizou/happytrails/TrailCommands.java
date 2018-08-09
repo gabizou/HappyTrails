@@ -174,7 +174,7 @@ class TrailCommands {
                 return Sponge.getRegistry().getAllOf(this.type).stream()
                     .filter(x ->
                         x.getId().startsWith(arg)
-                        || x.getId().startsWith("happytrails:" + arg)
+                        || x.getId().startsWith(Constants.MOD_ID + ":" + arg)
                     )
                     .filter(x -> {
                         final String trimmedId = x.getId().contains(":") ? x.getId().split(":")[1] : x.getId();

@@ -53,10 +53,10 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
         return INSTANCE;
     }
 
-    private Trail defaultTrail = new Trail(HappyTrails.PLUGIN_ID + ":hearts", "Hearts", 10, 30, ParticleEffect.builder()
+    private Trail defaultTrail = new Trail(Constants.HEARTS_ID, Constants.HEARTS_NAME, Constants.DEFAULT_PERIOD, Constants.DEFAULT_RADIUS, ParticleEffect.builder()
         .type(ParticleTypes.HEART)
         .quantity(7)
-        .option(ParticleOptions.VELOCITY, Trail.DEFAULT_VELOCITY)
+        .option(ParticleOptions.VELOCITY, Constants.DEFAULT_VELOCITY)
         .build());
 
     Trail getDefaultTrail() {
@@ -67,7 +67,7 @@ public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
     public Optional<Trail> getById(String id) {
         String key = checkNotNull(id).toLowerCase(Locale.ENGLISH);
         if (!key.contains(":")) {
-            key = HappyTrails.PLUGIN_ID + ":" + key;
+            key = Constants.MOD_ID + ":" + key;
         }
         return Optional.ofNullable(this.trails.get(key));
     }

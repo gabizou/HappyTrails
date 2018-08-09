@@ -24,7 +24,6 @@
  */
 package com.gabizou.happytrails;
 
-import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.MoreObjects;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -72,14 +71,6 @@ public class Trail implements CatalogType, DataSerializable {
         );
     }
 
-    static final DataQuery ID_QUERY = DataQuery.of("id");
-    static final DataQuery NAME_QUERY = DataQuery.of("name");
-    static final DataQuery PERIOD = DataQuery.of("period");
-    static final DataQuery RADIUS = DataQuery.of("radius");
-    static final DataQuery PARTICLE_EFFECT = DataQuery.of("particle_effect");
-
-    static final Vector3d DEFAULT_VELOCITY = new Vector3d(0.5, 1, 0.4);
-
     @Setting private String id;
     @Setting private String name;
     @Setting int period = 5;
@@ -87,7 +78,7 @@ public class Trail implements CatalogType, DataSerializable {
     @Setting private ParticleEffect effect = ParticleEffect.builder()
         .type(ParticleTypes.HEART)
         .quantity(10)
-        .option(ParticleOptions.VELOCITY, DEFAULT_VELOCITY)
+        .option(ParticleOptions.VELOCITY, Constants.DEFAULT_VELOCITY)
         .option(ParticleOptions.SCALE, 1d)
         .build();
 
@@ -163,11 +154,11 @@ public class Trail implements CatalogType, DataSerializable {
     public DataContainer toContainer() {
         return DataContainer.createNew()
             .set(Queries.CONTENT_VERSION, this.getContentVersion())
-            .set(ID_QUERY, this.id)
-            .set(NAME_QUERY, this.name)
-            .set(PERIOD, this.period)
-            .set(RADIUS, this.radius)
-            .set(PARTICLE_EFFECT, this.effect);
+            .set(Constants.ID_QUERY, this.id)
+            .set(Constants.NAME_QUERY, this.name)
+            .set(Constants.PERIOD, this.period)
+            .set(Constants.RADIUS, this.radius)
+            .set(Constants.PARTICLE_EFFECT, this.effect);
     }
 
     public static final class Builder extends AbstractDataBuilder<Trail> implements DataBuilder<Trail> {
@@ -178,14 +169,14 @@ public class Trail implements CatalogType, DataSerializable {
 
         @Override
         protected Optional<Trail> buildContent(DataView container) throws InvalidDataException {
-            if (!container.contains(Trail.ID_QUERY, Trail.NAME_QUERY, Trail.PARTICLE_EFFECT)) {
+            if (!container.contains(Constants.ID_QUERY, Constants.NAME_QUERY, Constants.PARTICLE_EFFECT)) {
                 return Optional.empty();
             }
-            final String id = container.getString(Trail.ID_QUERY).get();
-            final String name = container.getString(Trail.NAME_QUERY).get();
-            final ParticleEffect effect = container.getSerializable(Trail.PARTICLE_EFFECT, ParticleEffect.class).get();
-            final int period = container.getInt(Trail.PERIOD).orElse(10);
-            final int radius = container.getInt(Trail.RADIUS).orElse(30);
+            final String id = container.getString(Constants.ID_QUERY).get();
+            final String name = container.getString(Constants.NAME_QUERY).get();
+            final ParticleEffect effect = container.getSerializable(Constants.PARTICLE_EFFECT, ParticleEffect.class).get();
+            final int period = container.getInt(Constants.PERIOD).orElse(10);
+            final int radius = container.getInt(Constants.RADIUS).orElse(30);
             return Optional.of(new Trail(id, name, period, radius, effect));
         }
     }

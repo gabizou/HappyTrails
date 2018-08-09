@@ -24,9 +24,13 @@
  */
 package com.gabizou.happytrails;
 
+import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.data.DataQuery;
+
 public class Constants {
 
     public static final String MOD_ID = "happytrails";
+    public static final String MOD_NAME = "HappyTrails";
 
     public static final String DEFAULT_TRAIL_ID = "happytrails:hearts";
     public static final String HEARTS_ID = MOD_ID + ":hearts";
@@ -39,4 +43,26 @@ public class Constants {
     public static final String STORMY_VILLAGER_NAME = "Stormy Villager";
     public static final String CRITICAL_STRIKE_NAME = "Critical Strike";
     public static final String CLOUDS_NAME = "Clouds";
+
+    public static final DataQuery ID_QUERY = DataQuery.of("id");
+    public static final DataQuery NAME_QUERY = DataQuery.of("name");
+    public static final DataQuery PERIOD = DataQuery.of("period");
+    public static final DataQuery RADIUS = DataQuery.of("radius");
+    public static final DataQuery PARTICLE_EFFECT = DataQuery.of("particle_effect");
+
+    public static final Vector3d DEFAULT_VELOCITY = new Vector3d(0.5, 1, 0.4);
+
+    public static final int DEFAULT_PERIOD = 10;
+    public static final int DEFAULT_RADIUS = 30;
+    public static final String KEY_ID = "trail";
+    public static final DataQuery KEY_QUERY = DataQuery.of("trail");
+
+    public static final class DataVersions {
+
+        public static final class Manipulator {
+
+            public static final int TRAIL_DATA_VERSION = 1;
+        }
+
+    }
 }

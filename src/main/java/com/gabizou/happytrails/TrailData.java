@@ -24,7 +24,6 @@
  */
 package com.gabizou.happytrails;
 
-import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
@@ -36,7 +35,6 @@ import org.spongepowered.api.data.manipulator.mutable.common.AbstractSingleCatal
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Optional;
 
@@ -74,7 +72,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
     @Override
     public int getContentVersion() {
-        return 1;
+        return Constants.DataVersions.Manipulator.TRAIL_DATA_VERSION;
     }
 
     Trail getTrail() {
@@ -100,7 +98,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
 
         @Override
         public int getContentVersion() {
-            return 1;
+            return Constants.DataVersions.Manipulator.TRAIL_DATA_VERSION;
         }
 
     }
@@ -108,7 +106,7 @@ public class TrailData extends AbstractSingleCatalogData<Trail, TrailData, Trail
     public static final class Builder extends AbstractDataBuilder<TrailData> implements DataManipulatorBuilder<TrailData, Immutable> {
 
         Builder() {
-            super(TrailData.class, 1);
+            super(TrailData.class, Constants.DataVersions.Manipulator.TRAIL_DATA_VERSION);
         }
 
         @Override
