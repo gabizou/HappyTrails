@@ -72,7 +72,7 @@ public class HappyTrails {
 
     private static final TypeToken<Value<Trail>> TRAIL_VALUE_TOKEN = new TypeToken<Value<Trail>>() {};
     static final Key<Value<Trail>>
-        TRAIL = Key.builder().type(TRAIL_VALUE_TOKEN).query(Constants.KEY_QUERY).id(Constants.MOD_ID + ":" + Constants.KEY_ID).name("Trail").build();
+        TRAIL = Key.builder().type(TRAIL_VALUE_TOKEN).query(Constants.KEY_QUERY).id(Constants.KEY_ID).name("Trail").build();
 
     @Nullable private static HappyTrails /* this is really hacky*/ INSTANCE;
 
@@ -128,7 +128,7 @@ public class HappyTrails {
             .dataClass(TrailData.class)
             .immutableClass(TrailData.Immutable.class)
             .builder(new TrailData.Builder())
-            .manipulatorId("trail")
+            .manipulatorId(Constants.KEY_ID)
             .dataName("Trail Data")
             .buildAndRegister(this.container);
     }
