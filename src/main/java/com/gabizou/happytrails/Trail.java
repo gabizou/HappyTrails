@@ -50,26 +50,6 @@ import java.util.Optional;
 @ConfigSerializable
 public class Trail implements CatalogType, DataSerializable {
 
-    private static final TypeToken<Trail> TRAIL_TYPE_TOKEN;
-    static {
-        TRAIL_TYPE_TOKEN = new TypeToken<Trail>() {};
-        TypeSerializers.getDefaultSerializers().registerType(TRAIL_TYPE_TOKEN, new TypeSerializer<Trail>() {
-            @Override
-            public Trail deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-
-                Class<?> clazz = type.getRawType();
-                return Sponge.getDataManager()
-                    .deserialize(Trail.class, DataTranslators.CONFIGURATION_NODE.translate(value))
-                    .orElseThrow(() -> new ObjectMappingException("Could not translate DataSerializable of type: " + clazz.getName()));
-            }
-
-            @Override
-            public void serialize(TypeToken<?> type, Trail obj, ConfigurationNode value) throws ObjectMappingException {
-                    value.setValue(DataTranslators.CONFIGURATION_NODE.translate(obj.toContainer()));
-                }
-            }
-        );
-    }
 
     @Setting private String id;
     @Setting private String name;
@@ -82,6 +62,14 @@ public class Trail implements CatalogType, DataSerializable {
         .option(ParticleOptions.SCALE, 1d)
         .build();
 
+    // This is used for configurate.
+    @SuppressWarnings("unused")
+    Trail() {
+        this.id = "";
+        this.name = "";
+
+    }
+
     Trail(String id, String name, int period, int radius, ParticleEffect effect) {
         this.id = id;
         this.name = name;
@@ -89,6 +77,7 @@ public class Trail implements CatalogType, DataSerializable {
         this.radius = radius;
         this.effect = effect;
     }
+
 
     void playEffect(Player player) {
         player.getWorld().spawnParticles(this.effect, player.getLocation().getPosition(), this.radius);

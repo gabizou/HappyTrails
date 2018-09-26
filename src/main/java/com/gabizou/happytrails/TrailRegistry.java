@@ -28,6 +28,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.persistence.DataTranslators;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -44,6 +51,27 @@ import java.util.Optional;
 public class TrailRegistry implements AdditionalCatalogRegistryModule<Trail> {
 
     private static final TrailRegistry INSTANCE = new TrailRegistry();
+
+    private static final TypeToken<Trail> TRAIL_TYPE_TOKEN;
+    static {
+        TRAIL_TYPE_TOKEN = new TypeToken<Trail>() {};
+        TypeSerializers.getDefaultSerializers().registerType(TRAIL_TYPE_TOKEN, new TypeSerializer<Trail>() {
+                @Override
+                public Trail deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+
+                    Class<?> clazz = type.getRawType();
+                    return Sponge.getDataManager()
+                        .deserialize(Trail.class, DataTranslators.CONFIGURATION_NODE.translate(value))
+                        .orElseThrow(() -> new ObjectMappingException("Could not translate DataSerializable of type: " + clazz.getName()));
+                }
+
+                @Override
+                public void serialize(TypeToken<?> type, Trail obj, ConfigurationNode value) throws ObjectMappingException {
+                    value.setValue(DataTranslators.CONFIGURATION_NODE.translate(obj.toContainer()));
+                }
+            }
+        );
+    }
 
     private final Map<String, Trail> trails = new HashMap<>();
 

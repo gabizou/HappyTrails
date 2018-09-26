@@ -32,8 +32,8 @@ public class Constants {
     public static final String MOD_ID = "happytrails";
     public static final String MOD_NAME = "HappyTrails";
 
-    public static final String DEFAULT_TRAIL_ID = "happytrails:hearts";
     public static final String HEARTS_ID = MOD_ID + ":hearts";
+    public static final String DEFAULT_TRAIL_ID = HEARTS_ID;
     public static final String VILLAGER_HAPPY_ID = MOD_ID + ":villager_happy";
     public static final String VILLAGER_STORM_ID = MOD_ID + ":villager_storm";
     public static final String CRIT_STRIKE_ID = MOD_ID + ":crit_strike";
